@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 // URL base desde variable de entorno
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+// Interfaces que definen la estructura de un usuario 
 interface User {
   username: string;
   email?: string;
@@ -14,6 +15,7 @@ interface User {
   sexo?: string;
 }
 
+// Interfaces que definen el contexto de autenticación
 interface AuthContextData {
   user: User | null;
   loading: boolean;
@@ -24,6 +26,7 @@ interface AuthContextData {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
+// Hook personalizado para consumir el contexto
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -32,10 +35,12 @@ export const useAuth = () => {
   return context;
 };
 
+// Proveedor de autenticación
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+// Cargar usuario
   useEffect(() => {
     loadStoredUser();
   }, []);
@@ -53,6 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+// Función de login
   const login = async (username: string, password: string) => {
     const url = `${API_URL}/users/login?username=${username}&password=${password}`;
     const response = await fetch(url, {
@@ -69,11 +75,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(userData);
   };
 
+// Función de logout
   const logout = async () => {
     await AsyncStorage.removeItem('@smartlife_user');
     setUser(null);
   };
 
+// Función de registro de usuario
   const register = async (userData: any) => {
     const response = await fetch(`${API_URL}/users/register`, {
       method: 'POST',

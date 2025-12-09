@@ -1,3 +1,5 @@
+// Imports principales
+import { SafeArea } from '@/components/ui/safe-area';
 import { useAuth } from '@/hooks/useAuth';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
@@ -6,6 +8,7 @@ import { ActivityIndicator, BackHandler, Image, RefreshControl, ScrollView, Styl
 // URL base desde variable de entorno
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+// Interface de datos para foto
 interface Photo {
   image_url: string;
   interpretation: string;
@@ -13,6 +16,7 @@ interface Photo {
   timestamp: any;
 }
 
+// Interface de datos para detalles
 interface DailyDetail {
   photos: Photo[];
   recommendation?: string;
@@ -20,6 +24,8 @@ interface DailyDetail {
 }
 
 export default function DetailsScreen() {
+
+// Estados y constantes de la pantalla
   const { user } = useAuth();
   const username = user?.username || "";
   const router = useRouter();
@@ -30,11 +36,11 @@ export default function DetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Botón físico de retroceso
+// Btn físico de back a gallery
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        router.push("/(tabs)/gallery");
+        router.push("/gallery");
         return true;
       };
 
@@ -43,6 +49,7 @@ export default function DetailsScreen() {
     }, [])
   );
 
+// Obtener detalles del día
   const fetchDetails = async () => {
     try {
       setLoading(true);
@@ -72,10 +79,12 @@ export default function DetailsScreen() {
     }
   };
 
+// Ejecutar carga inicial
   useEffect(() => {
     fetchDetails();
   }, [date]);
 
+// Deslizar para actualizar
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchDetails();
@@ -98,7 +107,9 @@ export default function DetailsScreen() {
     );
   }
 
+// Renderizado de la apantalla
   return (
+    <SafeArea>
     <ScrollView
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -129,20 +140,104 @@ export default function DetailsScreen() {
         </View>
       )}
     </ScrollView>
+    </SafeArea>
   );
 }
 
+// Estilos de la pantalla
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f4f7', padding: 10 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyText: { fontSize: 18, color: '#555', textAlign: 'center', paddingHorizontal: 20 },
-  dateLabel: { fontSize: 20, fontWeight: '700', marginBottom: 15, textAlign: 'center' },
-  photoContainer: { backgroundColor: '#fff', padding: 10, marginBottom: 15, borderRadius: 10, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 5, elevation: 3 },
-  photo: { width: '100%', height: 250, borderRadius: 10, marginBottom: 10 },
-  mealType: { fontSize: 16, fontWeight: '600', marginBottom: 5 },
-  interpretation: { fontSize: 14, color: '#555' },
-  recommendationContainer: { backgroundColor: '#fff', padding: 15, borderRadius: 10, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 5, elevation: 3, marginBottom: 15 },
-  recommendationTitle: { fontSize: 16, fontWeight: '700', marginBottom: 5, color: '#0077b6' },
-  recommendationText: { fontSize: 14, color: '#555' },
+
+// Contenedor principal
+  container: { 
+    flex: 1, 
+    backgroundColor: '#f0f4f7', 
+    padding: 10, 
+},
+
+// Pantalla de carga
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+},
+
+// Vista cuando no hay datos
+  emptyContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+},
+  emptyText: { 
+    fontSize: 18, 
+    color: '#555', 
+    textAlign: 'center', 
+    paddingHorizontal: 20, 
+},
+
+// Etiqueta fecha
+  dateLabel: { 
+    fontSize: 20, 
+    fontWeight: '700', 
+    marginBottom: 15, 
+    textAlign: 'center', 
+},
+
+// Contenedor individual de cada foto
+  photoContainer: { 
+    backgroundColor: '#fff', 
+    padding: 10, 
+    marginBottom: 15, 
+    borderRadius: 10, 
+    shadowColor: "#000", 
+    shadowOpacity: 0.1, 
+    shadowRadius: 5, 
+    elevation: 3, 
+},
+
+// Imagen
+  photo: { 
+    width: '100%', 
+    height: 250, 
+    borderRadius: 10, 
+    marginBottom: 10, 
+},
+
+// Texto tipo comida
+  mealType: { 
+    fontSize: 16, 
+    fontWeight: '600', 
+    marginBottom: 5, 
+},
+
+// Texto interpretación
+  interpretation: { 
+    fontSize: 14, 
+    color: '#555', 
+},
+
+// Contenedor recomendaciones
+  recommendationContainer: { 
+    backgroundColor: '#fff', 
+    padding: 15, 
+    borderRadius: 10, 
+    shadowColor: "#000", 
+    shadowOpacity: 0.1, 
+    shadowRadius: 5, 
+    elevation: 3, 
+    marginBottom: 15, 
+},
+
+// Título recomendación
+  recommendationTitle: { 
+    fontSize: 16, 
+    fontWeight: '700', 
+    marginBottom: 5, 
+    color: '#0077b6', 
+},
+
+// Texto recomendación
+  recommendationText: { 
+    fontSize: 14, 
+    color: '#555', 
+},
 });
