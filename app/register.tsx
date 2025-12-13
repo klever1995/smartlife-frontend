@@ -220,6 +220,7 @@ export default function RegisterScreen() {
           style={pickerStyles}
           placeholder={{ label: "Selecciona tu sexo", value: "" }}
           onValueChange={(value) => setSexo(value)}
+          value={sexo}
           items={[
             { label: "Masculino", value: "M" },
             { label: "Femenino", value: "F" },
@@ -250,6 +251,7 @@ const pickerStyles = {
     borderWidth: 1.5,
     borderColor: "#cfd8dc",
     marginBottom: 15,
+    color: 'black',
   },
 
 // Estilo del input para android
@@ -260,6 +262,7 @@ const pickerStyles = {
     borderWidth: 1.5,
     borderColor: "#cfd8dc",
     marginBottom: 15,
+    color: 'black',
   },
 };
 
