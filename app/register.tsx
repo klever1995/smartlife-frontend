@@ -2,15 +2,15 @@ import { SafeArea } from '@/components/ui/safe-area';
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -43,10 +43,34 @@ export default function RegisterScreen() {
 
   const edadCalculada = calcularEdad(fechaNacimiento);
 
+// Validación de email en el frontend
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+// Validación de contraseña en el frontend
+  const isValidPassword = (password: string) => {
+    return password.length >= 6;
+  };
+
 // Registrar usuario
   const handleRegister = async () => {
+    // Validación de campos obligatorios
     if (!username || !email || !password || !sexo) {
       Alert.alert("Error", "Completa todos los campos obligatorios");
+      return;
+    }
+
+    // Validación de formato email
+    if (!isValidEmail(email)) {
+      Alert.alert("Error", "Ingresa un correo electrónico válido");
+      return;
+    }
+
+    // Validación de fortaleza de contraseña
+    if (!isValidPassword(password)) {
+      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
@@ -66,14 +90,27 @@ export default function RegisterScreen() {
       });
 
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail || "Error al registrar");
+        const errorData = await response.json();
+        
+        // Manejar errores de validación de Pydantic (422)
+        if (response.status === 422 && errorData.detail) {
+          // Formatear múltiples errores de validación
+          const validationErrors = errorData.detail.map((err: any) => 
+            `• ${err.loc[err.loc.length - 1]}: ${err.msg}`
+          ).join('\n');
+          throw new Error(`Error de validación:\n${validationErrors}`);
+        }
+        
+        // Manejar otros errores HTTP (400, 404, etc.)
+        throw new Error(errorData.detail || `Error ${response.status}: ${response.statusText}`);
       }
 
+      const data = await response.json();
       Alert.alert("Éxito", "Usuario registrado correctamente");
       router.back();
     } catch (e: any) {
-      Alert.alert("Error", e.message);
+      // Mostrar el mensaje de error formateado
+      Alert.alert("Error", e.message || "Error desconocido al registrar");
     }
   };
 
@@ -90,6 +127,7 @@ export default function RegisterScreen() {
         <TextInput
           style={styles.input}
           placeholder="Usuario"
+          placeholderTextColor="gray"
           value={username}
           onChangeText={setUsername}
         />
@@ -97,6 +135,7 @@ export default function RegisterScreen() {
         <TextInput
           style={styles.input}
           placeholder="Correo"
+          placeholderTextColor="gray"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -105,6 +144,7 @@ export default function RegisterScreen() {
         <TextInput
           style={styles.input}
           placeholder="Contraseña"
+          placeholderTextColor="gray"
           value={password}
           onChangeText={setPassword}
           secureTextEntry

@@ -8,6 +8,12 @@
     "scheme": "smartlifeassistant",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/eaa18ed4-e280-4fa0-be43-5ee7cb2a2082"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -50,6 +56,9 @@
       "eas": {
         "projectId": "eaa18ed4-e280-4fa0-be43-5ee7cb2a2082"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }
