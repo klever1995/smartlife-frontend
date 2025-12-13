@@ -87,6 +87,7 @@ export default function LoginScreen() {
             <TextInput
               style={styles.input}
               placeholder="Ingresa tu contraseña"
+              placeholderTextColor="gray"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -192,6 +193,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
+    color: 'black',
   },
 
 // Btn iniciar sesión

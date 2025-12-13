@@ -288,6 +288,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: "#cfd8dc",
     marginBottom: 15,
+    color: 'black',
   },
 
 // Etiquetas
