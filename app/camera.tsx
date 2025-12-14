@@ -1,8 +1,5 @@
-// Imports principales
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { styles } from '@/app/styles/cameraStyle';
 import { SafeArea } from '@/components/ui/safe-area';
-import { sharedButtonStyles } from '@/constants/buttonStyles';
 import { useAuth } from '@/hooks/useAuth';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,7 +7,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, BackHandler, Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, BackHandler, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -51,7 +48,6 @@ export default function CameraScreen() {
       const res = await fetch(`${API_URL}/photos/interpret`, {
         method: "POST",
         body: formData,
-        // quitar Content-Type, fetch lo maneja automáticamente
       });
 
       const data = await res.json();
@@ -84,7 +80,6 @@ export default function CameraScreen() {
       const res = await fetch(`${API_URL}/photos/upload`, {
         method: "POST",
         body: formData,
-        // quitar Content-Type, fetch lo maneja automáticamente
       });
 
       if (!res.ok) throw new Error("Error al guardar la foto");
@@ -103,111 +98,90 @@ export default function CameraScreen() {
   };
 
   // Abrir cámara
-const handleTakePhoto = async () => {
-  const result = await ImagePicker.launchCameraAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images, // correcto para versiones <14
-    quality: 1,
-  });
-  if (!result.canceled) {
-    const uri = result.assets[0].uri;
-    setSelectedPhoto(uri);
-    await interpretPhoto(uri);
-  }
-};
+  const handleTakePhoto = async () => {
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setSelectedPhoto(uri);
+      await interpretPhoto(uri);
+    }
+  };
 
-// Seleccionar de galería
-const handleSelectFromGallery = async () => {
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images, // correcto para versiones <14
-    quality: 1,
-  });
-  if (!result.canceled) {
-    const uri = result.assets[0].uri;
-    setSelectedPhoto(uri);
-    await interpretPhoto(uri);
-  }
-};
-
+  // Seleccionar de galería
+  const handleSelectFromGallery = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setSelectedPhoto(uri);
+      await interpretPhoto(uri);
+    }
+  };
 
   const goHome = () => {
     router.push("/home");
   };
 
-  // Renderizado de la apantalla
+  // Renderizado de la pantalla
   return (
     <SafeArea>
-      <ThemedView style={cameraStyles.container}>
-        <TouchableOpacity style={cameraStyles.backButton} onPress={goHome}>
-          <Ionicons name="arrow-back" size={28} color="#0077b6" />
+      <View style={styles.container}>
+        <TouchableOpacity style={styles.backButton} onPress={goHome}>
+          <Ionicons name="arrow-back" size={28} color="#1565C0" />
         </TouchableOpacity>
 
-        <ThemedText type="title">Selecciona una opción</ThemedText>
+        <Text style={styles.title}>Selecciona una opción</Text>
 
-        <View style={cameraStyles.buttonsContainer}>
-          <TouchableOpacity style={sharedButtonStyles.button} onPress={handleTakePhoto}>
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleTakePhoto}>
             <FontAwesome5 name="camera" size={20} color="white" />
-            <ThemedText type="defaultSemiBold" style={sharedButtonStyles.buttonTextMargin}>Abrir cámara</ThemedText>
+            <Text style={styles.buttonText}>Abrir cámara</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={sharedButtonStyles.button} onPress={handleSelectFromGallery}>
+          <TouchableOpacity style={styles.button} onPress={handleSelectFromGallery}>
             <FontAwesome5 name="image" size={20} color="white" />
-            <ThemedText type="defaultSemiBold" style={sharedButtonStyles.buttonTextMargin}>Seleccionar de galería</ThemedText>
+            <Text style={styles.buttonText}>Seleccionar de galería</Text>
           </TouchableOpacity>
         </View>
 
         {selectedPhoto && (
-          <ScrollView style={{ marginTop: 20 }}>
-            <Image source={{ uri: selectedPhoto }} style={{ width: 300, height: 300, alignSelf: 'center', borderRadius: 10 }} />
+          <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+            <Image source={{ uri: selectedPhoto }} style={styles.imagePreview} />
             {isLoading ? (
-              <ActivityIndicator size="large" color="#0077b6" style={{ marginTop: 20 }} />
+              <ActivityIndicator size="large" color="#1565C0" style={styles.loader} />
             ) : (
               <>
-                <ThemedText type="defaultSemiBold" style={{ marginTop: 10, textAlign: 'center' }}>
-                  {interpretation}
-                </ThemedText>
+                <Text style={styles.interpretationText}>{interpretation}</Text>
 
-                <Picker
-                  selectedValue={mealType}
-                  onValueChange={(itemValue) => setMealType(itemValue)}
-                  style={{ marginTop: 15, marginHorizontal: 50, backgroundColor: 'white', color: '#000' }}
-                >
-                  <Picker.Item label="Desayuno" value="desayuno" />
-                  <Picker.Item label="Almuerzo" value="almuerzo" />
-                  <Picker.Item label="Cena" value="cena" />
-                  <Picker.Item label="Snack" value="snack" />
-                  <Picker.Item label="Comida extra" value="comida_extra" />
-                  <Picker.Item label="Postre" value="postre" />
-                </Picker>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={mealType}
+                    onValueChange={(itemValue) => setMealType(itemValue)}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Desayuno" value="desayuno" color="#212121" />
+                    <Picker.Item label="Almuerzo" value="almuerzo" color="#212121" />
+                    <Picker.Item label="Cena" value="cena" color="#212121" />
+                    <Picker.Item label="Snack" value="snack" color="#212121" />
+                    <Picker.Item label="Comida extra" value="comida_extra" color="#212121" />
+                    <Picker.Item label="Postre" value="postre" color="#212121" />
+                  </Picker>
+                </View>
 
-                <TouchableOpacity style={[sharedButtonStyles.button, { marginTop: 15 }]} onPress={savePhoto}>
+                <TouchableOpacity style={styles.saveButton} onPress={savePhoto} disabled={isLoading}>
                   <MaterialIcons name="save" size={20} color="white" />
-                  <ThemedText type="defaultSemiBold" style={sharedButtonStyles.buttonTextMargin}>Guardar</ThemedText>
+                  <Text style={styles.buttonText}>Guardar</Text>
                 </TouchableOpacity>
               </>
             )}
           </ScrollView>
         )}
-      </ThemedView>
+      </View>
     </SafeArea>
   );
 }
-
-// Estilos de la pantalla
-const cameraStyles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    padding: 20, 
-  },
-  buttonsContainer: { 
-    marginTop: 30, 
-    width: '100%', 
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 15,
-    zIndex: 10,
-  },
-});

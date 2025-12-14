@@ -1,5 +1,5 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+// Imports principales
+import styles from '@/app/styles/indexStyle';
 import { SafeArea } from '@/components/ui/safe-area';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'expo-router';
@@ -9,45 +9,36 @@ import {
   Alert,
   BackHandler,
   Image,
-  ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'; // Importar la librería
 
 export default function LoginScreen() {
-
-// Definición de constantes y estados locales
+  // Estados y constantes de la pantalla
   const router = useRouter();
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-// Bloquear botón físico de retroceso
+  // Bloquear botón físico de retroceso
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
-      () => {
-        // Evita que el usuario retroceda después de cerrar sesión
-        return true; // true = bloquea la acción por defecto
-      }
+      () => true
     );
-
-    return () => backHandler.remove(); // Limpia el event listener al desmontar
+    return () => backHandler.remove();
   }, []);
 
-// Iniciar sesión
+  // Iniciar sesión
   const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
       Alert.alert('Error', 'Por favor ingresa usuario y contraseña');
       return;
     }
-
     try {
       setLoading(true);
       await login(username, password);
@@ -59,210 +50,85 @@ export default function LoginScreen() {
     }
   };
 
-// Ir a registro
+  // Ir a registro
   const handleRegister = () => {
     router.push('/register');
   };
 
-//Renderizado de pantalla
   return (
     <SafeArea>
-      <ImageBackground 
-        source={require('@/assets/images/fondo.jpg')}
-        style={styles.backgroundImage}
-        resizeMode="cover"
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+        keyboardShouldPersistTaps="handled" 
+        enableOnAndroid={true} 
       >
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-        >
-          <ThemedView style={styles.container}>
-            <Image
-              source={require('@/assets/images/logo3.png')}
-              style={styles.logo}
-              resizeMode="contain"
+        <View style={styles.container}>
+          {/* Logo */}
+          <Image
+            source={require('@/assets/images/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          
+          {/* Títulos */}
+          <Text style={styles.title}>SmartLife</Text>
+          <Text style={styles.subtitle}>ASSISTANT</Text>
+          <Text style={styles.tagline}>Tu asistente de nutrición inteligente</Text>
+
+          {/* Campo de usuario */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Usuario</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ingresa tu usuario"
+              placeholderTextColor="#757575"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              editable={!loading}
             />
-            
-            <ThemedText type="subtitle" style={styles.subtitle}>
-              Tu asistente de nutrición inteligente
-            </ThemedText>
+          </View>
 
-            {/* Campo de usuario */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Usuario</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa tu usuario"
-                placeholderTextColor="gray"
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-                editable={!loading}
-              />
-            </View>
+          {/* Campo de contraseña */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Contraseña</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ingresa tu contraseña"
+              placeholderTextColor="#757575"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              editable={!loading}
+            />
+          </View>
 
-            {/* Campo de contraseña */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Contraseña</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa tu contraseña"
-                placeholderTextColor="gray"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                editable={!loading}
-              />
-            </View>
+          {/* Botón de login */}
+          <TouchableOpacity 
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.buttonText}>Iniciar Sesión</Text>
+            )}
+          </TouchableOpacity>
 
-            {/* Botón de login */}
-            <TouchableOpacity 
-              style={[styles.button, loading && styles.buttonDisabled]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <ThemedText type="default" style={styles.buttonText}>
-                  Iniciar Sesión
-                </ThemedText>
-              )}
-            </TouchableOpacity>
-
-            {/* Registro */}
-            <TouchableOpacity 
-              style={styles.registerButton} 
-              onPress={handleRegister}
-              disabled={loading}
-            >
-              <Text style={styles.noAccountText}>
-                ¿No tienes cuenta?
-                <Text style={styles.registerTextLink}> Regístrate</Text>
-              </Text>
-            </TouchableOpacity>
-          </ThemedView>
-        </KeyboardAvoidingView>
-      </ImageBackground>
+          {/* Registro */}
+          <TouchableOpacity 
+            style={styles.registerButton} 
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            <Text style={styles.noAccountText}>
+              ¿No tienes cuenta?
+              <Text style={styles.registerTextLink}> Regístrate</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAwareScrollView>
     </SafeArea>
   );
 }
-
-// Estilos de la pantalla
-const styles = StyleSheet.create({
-
-// Fondo de pantalla
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-
-// Contenedor principal
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    gap: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.37)',
-    paddingBottom: 60,
-  },
-
-// Logo de la app
-  logo: {
-    width: 250,
-    height: 250,
-    marginBottom: 30,
-  },
-
-// Texto subtítulo
-  subtitle: {
-    fontSize: 24,
-    textAlign: 'center',
-    color: '#21700dff',
-    marginBottom: 30,
-    fontWeight: 'bold',
-  },
-
-// Contenedor de imput
-  inputContainer: {
-    width: '100%',
-    marginBottom: 15,
-  },
-
-// Etiquetas de los imputs
-  label: {
-    fontSize: 17,
-    color: '#000405ff',
-    marginBottom: 6,
-    fontWeight: '600',
-  },
-
-// Campos de texto
-  input: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#ffffff',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    borderWidth: 1.5,
-    borderColor: '#cfd8dc',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-    color: 'black',
-  },
-
-// Btn iniciar sesión
-  button: {
-    width: '100%',
-    marginTop: 10,
-    paddingVertical: 15,
-    backgroundColor: '#4a90e2',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-
-// Btn deshabilitado
-  buttonDisabled: {
-    backgroundColor: '#a0c8f0',
-  },
-
-// Texto Btn
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-
-// Btn ir a registro
-  registerButton: {
-    marginTop: 15,
-    padding: 10,
-  },
-
-// No cuenta
-  noAccountText: {
-    color: '#000000ff',
-    fontSize: 17,
-  },
-
-// Registrarse
-  registerTextLink: {
-    color: '#0e5ab1ff',
-    textDecorationLine: 'underline',
-    fontSize: 17,
-    fontWeight: '600',
-  },
-
-  
-
-  
-});
-
-

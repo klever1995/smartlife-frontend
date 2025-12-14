@@ -1,9 +1,11 @@
 // Imports principales
+import { styles } from '@/app/styles/detailsStyle';
 import { SafeArea } from '@/components/ui/safe-area';
 import { useAuth } from '@/hooks/useAuth';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, BackHandler, Image, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, BackHandler, Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 // URL base desde variable de entorno
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -24,19 +26,17 @@ interface DailyDetail {
 }
 
 export default function DetailsScreen() {
-
-// Estados y constantes de la pantalla
+  // Estados y constantes de la pantalla
   const { user } = useAuth();
   const username = user?.username || "";
   const router = useRouter();
-
   const { date } = useLocalSearchParams<{ date: string }>();
 
   const [data, setData] = useState<DailyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-// Btn físico de back a gallery
+  // Btn físico de back a gallery
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -49,7 +49,7 @@ export default function DetailsScreen() {
     }, [])
   );
 
-// Obtener detalles del día
+  // Obtener detalles del día
   const fetchDetails = async () => {
     try {
       setLoading(true);
@@ -79,165 +79,139 @@ export default function DetailsScreen() {
     }
   };
 
-// Ejecutar carga inicial
+  // Ejecutar carga inicial
   useEffect(() => {
     fetchDetails();
   }, [date]);
 
-// Deslizar para actualizar
+  // Deslizar para actualizar
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchDetails();
     setRefreshing(false);
   };
 
+  // Regresar a galería
+  const goBack = () => {
+    router.push("/gallery");
+  };
+
+  // Pantalla de carga
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0077b6" />
-      </View>
+      <SafeArea>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#2E7D32" />
+          <Text style={styles.loadingText}>Cargando detalles...</Text>
+        </View>
+      </SafeArea>
     );
   }
 
+  // Sin datos
   if (!data || data.photos.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No hay fotos para este día.</Text>
-      </View>
+      <SafeArea>
+        <View style={styles.emptyContainer}>
+          <Ionicons name="image-outline" size={70} color="#757575" style={styles.emptyIcon} />
+          <Text style={styles.emptyTitle}>No hay fotos para este día</Text>
+          <Text style={styles.emptySubtitle}>No se encontraron registros para {date}</Text>
+          <TouchableOpacity style={styles.emptyButton} onPress={goBack}>
+            <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
+            <Text style={styles.emptyButtonText}>Volver a galería</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeArea>
     );
   }
 
-// Renderizado de la apantalla
+  // Renderizado de la pantalla
   return (
     <SafeArea>
-    <ScrollView
-      style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-    >
-      <Text style={styles.dateLabel}>Detalles del día: {date}</Text>
-
-      {data.photos.map((photo, idx) => (
-        <View key={idx} style={styles.photoContainer}>
-          <Image source={{ uri: photo.image_url }} style={styles.photo} />
-          <Text style={styles.mealType}>{photo.meal_type}</Text>
-          <Text style={styles.interpretation}>{photo.interpretation}</Text>
+      <View style={styles.mainContainer}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={goBack}>
+            <Ionicons name="arrow-back" size={24} color="#1565C0" />
+          </TouchableOpacity>
+          <View style={styles.headerCenter}>
+            <Ionicons name="calendar" size={20} color="#2E7D32" />
+            <Text style={styles.headerTitle}>Detalles del día</Text>
+          </View>
+          <View style={{ width: 40 }} />
         </View>
-      ))}
 
-      {data.recommendations && data.recommendations.length > 0 && (
-        <View style={styles.recommendationContainer}>
-          <Text style={styles.recommendationTitle}>💡 Recomendación completa</Text>
-          {data.recommendations.map((line, idx) => (
-            <Text key={idx} style={styles.recommendationText}>{line}</Text>
+        {/* Fecha */}
+        <View style={styles.dateContainer}>
+          <Text style={styles.dateLabel}>{date}</Text>
+          <Text style={styles.photoCount}>
+            {data.photos.length} {data.photos.length === 1 ? 'foto' : 'fotos'}
+          </Text>
+        </View>
+
+        <ScrollView
+          style={styles.container}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Lista de fotos */}
+          {data.photos.map((photo, idx) => (
+            <View key={idx} style={styles.photoCard}>
+              <View style={styles.photoHeader}>
+                <View style={styles.mealTypeContainer}>
+                  <Ionicons name="restaurant-outline" size={18} color="#2E7D32" />
+                  <Text style={styles.mealType}>{photo.meal_type}</Text>
+                </View>
+                <View style={styles.photoNumber}>
+                  <Text style={styles.photoNumberText}>{idx + 1}</Text>
+                </View>
+              </View>
+              
+              <Image source={{ uri: photo.image_url }} style={styles.photo} />
+              
+              <View style={styles.interpretationContainer}>
+                <Ionicons name="analytics-outline" size={18} color="#1565C0" style={styles.interpretationIcon} />
+                <Text style={styles.interpretation}>{photo.interpretation}</Text>
+              </View>
+            </View>
           ))}
-        </View>
-      )}
 
-      {data.recommendation && (
-        <View style={styles.recommendationContainer}>
-          <Text style={styles.recommendationTitle}>⭐ Recomendación final</Text>
-          <Text style={styles.recommendationText}>{data.recommendation}</Text>
-        </View>
-      )}
-    </ScrollView>
+          {/* Recomendaciones detalladas */}
+          {data.recommendations && data.recommendations.length > 0 && (
+            <View style={styles.recommendationCard}>
+              <View style={styles.recommendationHeader}>
+                <Ionicons name="bulb-outline" size={22} color="#FF9800" />
+                <Text style={styles.recommendationTitle}>Recomendaciones de IA</Text>
+              </View>
+              
+              <View style={styles.recommendationList}>
+                {data.recommendations.map((line, idx) => (
+                  <View key={idx} style={styles.recommendationItem}>
+                    <View style={styles.bulletPoint}>
+                      <Ionicons name="chevron-forward" size={12} color="#FF9800" />
+                    </View>
+                    <Text style={styles.recommendationText}>{line}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Recomendación final */}
+          {data.recommendation && (
+            <View style={styles.finalRecommendationCard}>
+              <View style={styles.finalRecommendationHeader}>
+                <Ionicons name="star" size={22} color="#FFC107" />
+                <Text style={styles.finalRecommendationTitle}>Recomendación final</Text>
+              </View>
+              <Text style={styles.finalRecommendationText}>{data.recommendation}</Text>
+            </View>
+          )}
+
+          {/* Espacio al final */}
+          <View style={styles.bottomSpacer} />
+        </ScrollView>
+      </View>
     </SafeArea>
   );
 }
-
-// Estilos de la pantalla
-const styles = StyleSheet.create({
-
-// Contenedor principal
-  container: { 
-    flex: 1, 
-    backgroundColor: '#f0f4f7', 
-    padding: 10, 
-},
-
-// Pantalla de carga
-  loadingContainer: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-},
-
-// Vista cuando no hay datos
-  emptyContainer: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-},
-  emptyText: { 
-    fontSize: 18, 
-    color: '#555', 
-    textAlign: 'center', 
-    paddingHorizontal: 20, 
-},
-
-// Etiqueta fecha
-  dateLabel: { 
-    fontSize: 20, 
-    fontWeight: '700', 
-    marginBottom: 15, 
-    textAlign: 'center', 
-},
-
-// Contenedor individual de cada foto
-  photoContainer: { 
-    backgroundColor: '#fff', 
-    padding: 10, 
-    marginBottom: 15, 
-    borderRadius: 10, 
-    shadowColor: "#000", 
-    shadowOpacity: 0.1, 
-    shadowRadius: 5, 
-    elevation: 3, 
-},
-
-// Imagen
-  photo: { 
-    width: '100%', 
-    height: 250, 
-    borderRadius: 10, 
-    marginBottom: 10, 
-},
-
-// Texto tipo comida
-  mealType: { 
-    fontSize: 16, 
-    fontWeight: '600', 
-    marginBottom: 5, 
-},
-
-// Texto interpretación
-  interpretation: { 
-    fontSize: 14, 
-    color: '#555', 
-},
-
-// Contenedor recomendaciones
-  recommendationContainer: { 
-    backgroundColor: '#fff', 
-    padding: 15, 
-    borderRadius: 10, 
-    shadowColor: "#000", 
-    shadowOpacity: 0.1, 
-    shadowRadius: 5, 
-    elevation: 3, 
-    marginBottom: 15, 
-},
-
-// Título recomendación
-  recommendationTitle: { 
-    fontSize: 16, 
-    fontWeight: '700', 
-    marginBottom: 5, 
-    color: '#0077b6', 
-},
-
-// Texto recomendación
-  recommendationText: { 
-    fontSize: 14, 
-    color: '#555', 
-},
-});
