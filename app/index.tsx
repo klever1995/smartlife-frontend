@@ -3,12 +3,15 @@ import { ThemedView } from '@/components/themed-view';
 import { SafeArea } from '@/components/ui/safe-area';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
   Image,
   ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -24,6 +27,19 @@ export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+// Bloquear botón físico de retroceso
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        // Evita que el usuario retroceda después de cerrar sesión
+        return true; // true = bloquea la acción por defecto
+      }
+    );
+
+    return () => backHandler.remove(); // Limpia el event listener al desmontar
+  }, []);
 
 // Iniciar sesión
   const handleLogin = async () => {
@@ -56,72 +72,78 @@ export default function LoginScreen() {
         style={styles.backgroundImage}
         resizeMode="cover"
       >
-        <ThemedView style={styles.container}>
-          <Image
-            source={require('@/assets/images/logo3.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          
-          <ThemedText type="subtitle" style={styles.subtitle}>
-            Tu asistente de nutrición inteligente
-          </ThemedText>
-
-          {/* Campo de usuario */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Usuario</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingresa tu usuario"
-              placeholderTextColor="gray"
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-              editable={!loading}
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        >
+          <ThemedView style={styles.container}>
+            <Image
+              source={require('@/assets/images/logo3.png')}
+              style={styles.logo}
+              resizeMode="contain"
             />
-          </View>
+            
+            <ThemedText type="subtitle" style={styles.subtitle}>
+              Tu asistente de nutrición inteligente
+            </ThemedText>
 
-          {/* Campo de contraseña */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Contraseña</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingresa tu contraseña"
-              placeholderTextColor="gray"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              editable={!loading}
-            />
-          </View>
+            {/* Campo de usuario */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Usuario</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ingresa tu usuario"
+                placeholderTextColor="gray"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+                editable={!loading}
+              />
+            </View>
 
-          {/* Botón de login */}
-          <TouchableOpacity 
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <ThemedText type="default" style={styles.buttonText}>
-                Iniciar Sesión
-              </ThemedText>
-            )}
-          </TouchableOpacity>
+            {/* Campo de contraseña */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Contraseña</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ingresa tu contraseña"
+                placeholderTextColor="gray"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                editable={!loading}
+              />
+            </View>
 
-          {/* Registro */}
-          <TouchableOpacity 
-            style={styles.registerButton} 
-            onPress={handleRegister}
-            disabled={loading}
-          >
-            <Text style={styles.noAccountText}>
-              ¿No tienes cuenta?
-              <Text style={styles.registerTextLink}> Regístrate</Text>
-            </Text>
-          </TouchableOpacity>
-        </ThemedView>
+            {/* Botón de login */}
+            <TouchableOpacity 
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <ThemedText type="default" style={styles.buttonText}>
+                  Iniciar Sesión
+                </ThemedText>
+              )}
+            </TouchableOpacity>
+
+            {/* Registro */}
+            <TouchableOpacity 
+              style={styles.registerButton} 
+              onPress={handleRegister}
+              disabled={loading}
+            >
+              <Text style={styles.noAccountText}>
+                ¿No tienes cuenta?
+                <Text style={styles.registerTextLink}> Regístrate</Text>
+              </Text>
+            </TouchableOpacity>
+          </ThemedView>
+        </KeyboardAvoidingView>
       </ImageBackground>
     </SafeArea>
   );
