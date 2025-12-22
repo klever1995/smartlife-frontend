@@ -17,6 +17,6 @@ export const SafeArea: React.FC<SafeAreaProps> = ({ children, style }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#000000ff', // color de fondo global
+    backgroundColor: '#000000ff', 
   },
 });
