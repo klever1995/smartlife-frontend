@@ -97,24 +97,54 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 
-  // Contenedor del selector de tipo de comida
-pickerContainer: {
-  marginTop: 20,
-  marginHorizontal: 20,
-  backgroundColor: '#FFFFFF',
-  borderRadius: 12,
-  borderWidth: 2,
-  borderColor: '#E0E0E0',
-  overflow: 'hidden',
-},
+  // Contenedor de botones de tipo de comida
+  mealTypeContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginTop: 20,
+    marginHorizontal: 20,
+    gap: 8,
+  },
 
-  // Selector de tipo de comida
-picker: {
-  width: '100%',
-  height: 50,
-  color: '#000000',
-  backgroundColor: '#FFFFFF',
-},
+    // Texto de etiqueta para tipo de comida
+  mealTypeLabel: {
+    marginTop: 20,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#212121',
+    textAlign: 'center',
+    marginHorizontal: 20,
+  },
+
+  // Botón individual de tipo de comida
+  mealTypeButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+
+  // Botón seleccionado
+  mealTypeButtonSelected: {
+    backgroundColor: '#2E7D32',
+    borderColor: '#2E7D32',
+  },
+
+  // Texto del botón
+  mealTypeText: {
+    color: '#666',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+
+  // Texto del botón seleccionado
+  mealTypeTextSelected: {
+    color: 'white',
+    fontWeight: '600',
+  },
 
   // Botón primario (Guardar interpretación)
   saveButton: {

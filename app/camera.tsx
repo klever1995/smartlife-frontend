@@ -3,7 +3,6 @@ import { SafeArea } from '@/components/ui/safe-area';
 import { useAuth } from '@/hooks/useAuth';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -157,22 +156,27 @@ export default function CameraScreen() {
             ) : (
               <>
                 <Text style={styles.interpretationText}>{interpretation}</Text>
-
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={mealType}
-                    onValueChange={(itemValue) => setMealType(itemValue)}
-                    style={styles.picker}
-                    dropdownIconColor="#212121"
-                    mode="dialog"  // ← CAMBIA A "dialog"
-                  >   
-                    <Picker.Item label="Desayuno" value="desayuno" color="#212121" />
-                    <Picker.Item label="Almuerzo" value="almuerzo" color="#212121" />
-                    <Picker.Item label="Cena" value="cena" color="#212121" />
-                    <Picker.Item label="Snack" value="snack" color="#212121" />
-                    <Picker.Item label="Comida extra" value="comida_extra" color="#212121" />
-                    <Picker.Item label="Postre" value="postre" color="#212121" />
-                  </Picker>
+                  
+                  <Text style={styles.mealTypeLabel}>Seleccione el tipo de comida</Text>
+                {/* Selector de tipo de comida - CAMBIADO A BOTONES */}
+                <View style={styles.mealTypeContainer}>
+                  {['desayuno', 'almuerzo', 'cena', 'snack', 'comida_extra', 'postre'].map((item) => (
+                    <TouchableOpacity
+                      key={item}
+                      style={[
+                        styles.mealTypeButton,
+                        mealType === item && styles.mealTypeButtonSelected
+                      ]}
+                      onPress={() => setMealType(item)}
+                    >
+                      <Text style={[
+                        styles.mealTypeText,
+                        mealType === item && styles.mealTypeTextSelected
+                      ]}>
+                        {item.charAt(0).toUpperCase() + item.slice(1)}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
 
                 <TouchableOpacity style={styles.saveButton} onPress={savePhoto} disabled={isLoading}>
