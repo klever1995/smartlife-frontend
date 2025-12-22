@@ -98,23 +98,23 @@ export const styles = StyleSheet.create({
   },
 
   // Contenedor del selector de tipo de comida
-  pickerContainer: {
-    marginTop: 20,
-    marginHorizontal: 20,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
-    overflow: 'hidden',
-  },
+pickerContainer: {
+  marginTop: 20,
+  marginHorizontal: 20,
+  backgroundColor: '#FFFFFF',
+  borderRadius: 12,
+  borderWidth: 2,
+  borderColor: '#E0E0E0',
+  overflow: 'hidden',
+},
 
   // Selector de tipo de comida
-  picker: {
-    width: '100%',
-    height: 50,
-    color: '#000000ff', 
-    backgroundColor: '#FFFFFF',
-  },
+picker: {
+  width: '100%',
+  height: 50,
+  color: '#000000',
+  backgroundColor: '#FFFFFF',
+},
 
   // Botón primario (Guardar interpretación)
   saveButton: {

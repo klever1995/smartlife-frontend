@@ -163,7 +163,9 @@ export default function CameraScreen() {
                     selectedValue={mealType}
                     onValueChange={(itemValue) => setMealType(itemValue)}
                     style={styles.picker}
-                  >
+                    dropdownIconColor="#212121"
+                    mode="dialog"  // ← CAMBIA A "dialog"
+                  >   
                     <Picker.Item label="Desayuno" value="desayuno" color="#212121" />
                     <Picker.Item label="Almuerzo" value="almuerzo" color="#212121" />
                     <Picker.Item label="Cena" value="cena" color="#212121" />
