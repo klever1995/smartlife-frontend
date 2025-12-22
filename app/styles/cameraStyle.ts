@@ -112,7 +112,8 @@ export const styles = StyleSheet.create({
   picker: {
     width: '100%',
     height: 50,
-    color: '#212121', 
+    color: '#000000ff', 
+    backgroundColor: '#FFFFFF',
   },
 
   // Botón primario (Guardar interpretación)

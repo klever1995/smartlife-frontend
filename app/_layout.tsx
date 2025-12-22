@@ -1,6 +1,6 @@
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider } from '@/hooks/useAuth';
-import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
@@ -11,7 +11,7 @@ export default function RootLayout() {
 // Provee el contexto de autenticación a toda la app
   return (
     <AuthProvider>
-      <ThemeProvider value={DefaultTheme}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
 {/*Apunta al index*/}
           <Stack.Screen name="index" options={{ headerShown: false }} />
