@@ -117,15 +117,25 @@ export const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
 
+  // Icono del tipo de comida
+  mealTypeIcon: {
+  width: 24,
+  height: 24,
+  marginBottom: 4,   
+},
+
   // Botón individual de tipo de comida
   mealTypeButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
+  flexDirection: 'column',    
+  alignItems: 'center',      
+  justifyContent: 'center',
+  paddingHorizontal: 16,
+  paddingVertical: 10,
+  backgroundColor: '#F0F0F0',
+  borderRadius: 20,
+  borderWidth: 1,
+  borderColor: '#E0E0E0',
+},
 
   // Botón seleccionado
   mealTypeButtonSelected: {

@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
+
 import { ActivityIndicator, Alert, BackHandler, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -126,6 +127,16 @@ export default function CameraScreen() {
     router.push("/home");
   };
 
+    // Mapeo de íconos
+  const mealIcons: Record<string, any> = {
+    desayuno: require('@/assets/images/desayuno.png'),
+    almuerzo: require('@/assets/images/almuerzo.png'),
+    cena: require('@/assets/images/cena.png'),
+    snack: require('@/assets/images/snack.png'),
+    comida_extra: require('@/assets/images/extra.png'),
+    postre: require('@/assets/images/postre.png'),
+  };
+
   // Renderizado de la pantalla
   return (
     <SafeArea>
@@ -169,6 +180,7 @@ export default function CameraScreen() {
                       ]}
                       onPress={() => setMealType(item)}
                     >
+                      <Image source={mealIcons[item]} style={styles.mealTypeIcon} />
                       <Text style={[
                         styles.mealTypeText,
                         mealType === item && styles.mealTypeTextSelected
